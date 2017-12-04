@@ -40,14 +40,19 @@ SSL_CTX* InitCTX(void)
 {   const SSL_METHOD *method;
     SSL_CTX *ctx;
  
-    OpenSSL_add_all_algorithms();  /* Load cryptos, et.al. */
-    SSL_load_error_strings();   /* Bring in and register error messages */
 #if OPENSSL_API_COMPAT >= 0x10100000L
+    const OPENSSL_INIT_SETTINGS *settings = OPENSSL_INIT_new();
+    OPENSSL_init_ssl(
+       OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS,
+       settings);
     method = TLS_client_method();  /* create new server-method instance */
 #else
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();  /* load & register all cryptos, etc. */
+    SSL_load_error_strings();   /* load all error messages */
     method = SSLv23_client_method();  /* create new server-method instance */
 #endif
-    ctx = SSL_CTX_new(method);   /* Create new context */
+    ctx = SSL_CTX_new(method);   /* create new context from method */
     if ( ctx == NULL )
     {
         ERR_print_errors_fp(stderr);
@@ -55,6 +60,7 @@ SSL_CTX* InitCTX(void)
     }
     return ctx;
 }
+ 
  
 void ShowCerts(SSL* ssl)
 {   X509 *cert;
@@ -89,7 +95,6 @@ int main(int count, char *strings[])
         printf("usage: %s <hostname> <portnum>\n", strings[0]);
         exit(0);
     }
-    SSL_library_init();
     hostname=strings[1];
     portnum=strings[2];
  

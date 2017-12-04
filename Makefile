@@ -53,5 +53,6 @@ ssl_client: ssl_client.c Makefile
 gencert:
 	openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout mycert.pem -out mycert.pem
 
+.PHONY: clean
 clean:
-	rm ./ssl_client
+	@rm ./ssl_client
