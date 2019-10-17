@@ -98,8 +98,8 @@ int main(int count, char *strings[])
     hostname=strings[1];
     portnum=strings[2];
  
-    ctx = InitCTX();
-    server = OpenConnection(hostname, atoi(portnum));
+    server = OpenConnection(hostname, atoi(portnum)); /* open connection to server */
+    ctx = InitCTX();	/* Create a ssl context */
     ssl = SSL_new(ctx);      /* create new SSL connection state */
     SSL_set_fd(ssl, server);    /* attach the socket descriptor */
     if ( SSL_connect(ssl) == FAIL )   /* perform the connection */
